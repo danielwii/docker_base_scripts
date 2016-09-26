@@ -89,7 +89,7 @@ function download_github_file() {
 }
 
 function download_url_file() {
-	env | grep ^GITHUB_FILE
+	env | grep ^URL_FILE
 	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
 	echo "Will download $count file(s) from url..."
 	for index in $(seq $count); do
@@ -110,6 +110,30 @@ function download_url_file() {
 			echo '----------------------------------------'
 		else
 			echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
+		fi
+	done
+}
+
+function load_env() {
+	env | grep ^ENV_FILE
+	local count=$((`env | grep '^ENV_FILE_[0-9]\' | wc -l` / 2))
+	echo "Will download $count file(s) from url..."
+	for index in $(seq $count); do
+		local _src_tag="ENV_FILE_$(($index - 1))"
+		local _src=`printenv $_src_tag`
+		echo src is $_src
+		if [[ ${_src} != '' ]]; then
+			mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
+			echo "download from $_src to /envs/$_src ..."
+			curl --silent \
+				--location $_src > /envs/$_src
+			echo 'File downloaded...'
+			echo '----------------------------------------'
+			cat /envs/$_src
+			. /envs/$_src
+			echo '----------------------------------------'
+		else
+			echo "ENV_FILE_$(($index - 1)) not defined..."
 		fi
 	done
 }
@@ -139,4 +163,6 @@ _________ .
 *****************************************************************
 _EOF_
 
+load_env
 download_github_file
+download_url_file

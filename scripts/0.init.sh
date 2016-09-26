@@ -88,12 +88,30 @@ function download_github_file() {
 	fi
 }
 
-function help {
-    echo "[X] -----------------------------"
-    echo "[X] Commands"
-    echo "[X] pkgs      - Install Packages"
-    echo "[X] serve     - Serve Hubot"
-    echo "[X] -----------------------------"
+function download_url_file() {
+	env | grep ^GITHUB_FILE
+	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
+	echo "Will download $count file(s) from url..."
+	for index in $(seq $count); do
+		local _src_tag="URL_FILE_$(($index - 1))_SRC"
+		local _dst_tag="URL_FILE_$(($index - 1))_DEST"
+		local _src=`printenv $_src_tag`
+		local _dst=`printenv $_dst_tag`
+		echo src is $_src
+		echo dest is $_dst
+		if [[ ${_src} != '' && ${_dst} != '' ]]; then
+			mkdir -p $(dirname "$_dst") && touch "$_dst"
+			echo "download from $_src to $_dst ..."
+			curl --silent \
+				--location $_src > $_dst
+			echo 'File downloaded...'
+			echo '----------------------------------------'
+			cat $_dst
+			echo '----------------------------------------'
+		else
+			echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
+		fi
+	done
 }
 
 ##### Info
@@ -116,7 +134,7 @@ _________ .
 \     \____/ __ \\  ___/|  | \/  |  /\___ \ .
  \______  (____  /\___  >__|  |____//____  > .
         \/     \/     \/                 \/ .
-                                 - logstash ${changelog__latest:-demo version}
+                                 - scripts ${changelog__latest:-demo version}
 
 *****************************************************************
 _EOF_

@@ -116,7 +116,7 @@ function download_url_file() {
 
 function load_env() {
 	env | grep ^ENV_FILE
-	local count=$((`env | grep '^ENV_FILE_[0-9]\' | wc -l`))
+	local count=$((`env | grep '^ENV_FILE_[0-9]' | wc -l`))
 	echo "Will download $count file(s) from url..."
 	for index in $(seq $count); do
 		local _src_tag="ENV_FILE_$(($index - 1))"

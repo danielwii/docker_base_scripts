@@ -124,13 +124,14 @@ function load_env() {
 		echo src is $_src
 		if [[ ${_src} != '' ]]; then
 			mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
-			echo "download from $_src to /envs/$_src ..."
+			echo "download from $_src to /envs/$index ..."
 			curl --silent \
-				--location $_src > /envs/$_src
+				--location $_src > /envs/$index
 			echo 'File downloaded...'
 			echo '----------------------------------------'
-			cat /envs/$_src
-			. /envs/$_src
+            echo /envs/$index
+			cat /envs/$index
+			. /envs/$index
 			echo '----------------------------------------'
 		else
 			echo "ENV_FILE_$(($index - 1)) not defined..."
@@ -163,6 +164,5 @@ _________ .
 *****************************************************************
 _EOF_
 
-load_env
 download_github_file
 download_url_file

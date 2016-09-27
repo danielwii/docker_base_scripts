@@ -22,7 +22,13 @@
 
 - Add repo and dependencies to /init
 
-        RUN apt-get update && apt-get install -y supervisor curl
+        # ubuntu
+        RUN apt-get update && apt-get install -y supervisor curl \
+            && rm -rf /var/lib/apt/lists/*
+        
+        # alpine
+        RUN apk --no-cache add supervisor curl
+        
         ADD https://github.com/danielwii/docker_base_scripts/archive/0.1.0.tar.gz /init/archive.tar.gz
         RUN tar zxvf /init/archive.tar.gz -C /init --xform='s|docker_base_scripts-0.1.0||S' --verbose --show-transformed-names
         # RUN git clone --depth=1 https://github.com/danielwii/docker_base_scripts.git /init

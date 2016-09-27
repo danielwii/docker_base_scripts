@@ -4,6 +4,7 @@
 
 - download private github file
 
+
     # private token
     GITHUB_TOKEN
     # org/project/contents/..../file?
@@ -12,6 +13,7 @@
     GITHUB_FILE_{index}_DEST
 
 - download file from url
+
 
     # http src
     URL_FILE_{index}_SRC
@@ -22,6 +24,7 @@
 
 - Add repo and dependencies to /init
 
+
     RUN apt-get update && apt-get install -y supervisor curl
     ADD https://github.com/danielwii/docker_base_scripts/archive/0.1.0.tar.gz /init/archive.tar.gz
     RUN tar zxvf /init/archive.tar.gz -C /init --xform='s|docker_base_scripts-0.1.0||S' --verbose --show-transformed-names
@@ -29,8 +32,10 @@
 
 - Add your custom program config to /init/conf
 
+
     ADD supervisor.app.conf /init/conf/
 
 - Start with default supervisor config, all files defined in env will be download.
+
 
     CMD ["supervisord", "-c", "/init/supervisord.conf"]

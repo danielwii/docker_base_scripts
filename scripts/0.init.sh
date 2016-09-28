@@ -2,8 +2,8 @@
 
 ##### Init
 
-set -e
-#set -exumk
+#set -e # Stop when error occurred
+#set -xumk
 
 ##### Constants
 
@@ -57,34 +57,35 @@ function parse_yml() {
 function download_github_file() {
 	env | grep ^GITHUB_FILE
 	local count=$((`env | grep '^GITHUB_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
-	echo "Will download $count file(s) from github..."
-	if [[ ${GITHUB_TOKEN} != '' ]]; then
-		for index in $(seq $count); do
-			local _src_tag="GITHUB_FILE_$(($index - 1))_SRC"
-			local _dst_tag="GITHUB_FILE_$(($index - 1))_DEST"
-			local _src=`printenv $_src_tag`
-			local _dst=`printenv $_dst_tag`
-			echo src is $_src
-			echo dest is $_dst
-			if [[ ${_src} != '' && ${_dst} != '' ]]; then
-				mkdir -p $(dirname "$_dst") && touch "$_dst"
-				echo "download from $_src to $_dst ..."
-				curl --silent \
-					--header "Authorization: token $GITHUB_TOKEN" \
-					--header 'Accept: application/vnd.github.v3.raw' \
-					--location "https://api.github.com/repos/$_src" > $_dst
-#					--remote-name $_dst \
-				echo 'File downloaded...'
-				echo '----------------------------------------'
-				cat $_dst
-				echo '----------------------------------------'
-			else
-				echo "Neither GITHUB_FILE_$(($index - 1))_SRC or GITHUB_FILE_$(($index - 1))_DEST defined..."
-			fi
-		done
-	else
-		echo 'Github token is empty...'
-		exit 1
+    echo "Will download $count file(s) from github..."
+	if [[ ${count} -gt 0 ]]; then
+        if [[ ${GITHUB_TOKEN} != '' ]]; then
+            for index in $(seq ${count}); do
+                local _src_tag="GITHUB_FILE_$(($index - 1))_SRC"
+                local _dst_tag="GITHUB_FILE_$(($index - 1))_DEST"
+                local _src=`printenv ${_src_tag}`
+                local _dst=`printenv ${_dst_tag}`
+                echo src is ${_src}
+                echo dest is ${_dst}
+                if [[ ${_src} != '' && ${_dst} != '' ]]; then
+                    mkdir -p $(dirname "$_dst") && touch "$_dst"
+                    echo "download from $_src to $_dst ..."
+                    curl --silent \
+                        --header "Authorization: token $GITHUB_TOKEN" \
+                        --header 'Accept: application/vnd.github.v3.raw' \
+                        --location "https://api.github.com/repos/$_src" > ${_dst}
+    #					--remote-name $_dst \
+                    echo 'File downloaded...'
+                    echo '----------------------------------------'
+                    cat ${_dst}
+                    echo '----------------------------------------'
+                else
+                    echo "Neither GITHUB_FILE_$(($index - 1))_SRC or GITHUB_FILE_$(($index - 1))_DEST defined..."
+                fi
+            done
+        else
+            echo 'Github token is empty...'
+        fi
 	fi
 }
 
@@ -92,51 +93,55 @@ function download_url_file() {
 	env | grep ^URL_FILE
 	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
 	echo "Will download $count file(s) from url..."
-	for index in $(seq $count); do
-		local _src_tag="URL_FILE_$(($index - 1))_SRC"
-		local _dst_tag="URL_FILE_$(($index - 1))_DEST"
-		local _src=`printenv $_src_tag`
-		local _dst=`printenv $_dst_tag`
-		echo src is $_src
-		echo dest is $_dst
-		if [[ ${_src} != '' && ${_dst} != '' ]]; then
-			mkdir -p $(dirname "$_dst") && touch "$_dst"
-			echo "download from $_src to $_dst ..."
-			curl --silent \
-				--location $_src > $_dst
-			echo 'File downloaded...'
-			echo '----------------------------------------'
-			cat $_dst
-			echo '----------------------------------------'
-		else
-			echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
-		fi
-	done
+	if [[ ${count} -gt 0 ]]; then
+        for index in $(seq ${count}); do
+            local _src_tag="URL_FILE_$(($index - 1))_SRC"
+            local _dst_tag="URL_FILE_$(($index - 1))_DEST"
+            local _src=`printenv ${_src_tag}`
+            local _dst=`printenv ${_dst_tag}`
+            echo src is ${_src}
+            echo dest is ${_dst}
+            if [[ ${_src} != '' && ${_dst} != '' ]]; then
+                mkdir -p $(dirname "$_dst") && touch "$_dst"
+                echo "download from $_src to $_dst ..."
+                curl --silent \
+                    --location ${_src} > ${_dst}
+                echo 'File downloaded...'
+                echo '----------------------------------------'
+                cat ${_dst}
+                echo '----------------------------------------'
+            else
+                echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
+            fi
+        done
+	fi
 }
 
 function load_env() {
 	env | grep ^ENV_FILE
 	local count=$((`env | grep '^ENV_FILE_[0-9]' | wc -l`))
 	echo "Will download $count file(s) from url..."
-	for index in $(seq $count); do
-		local _src_tag="ENV_FILE_$(($index - 1))"
-		local _src=`printenv $_src_tag`
-		echo src is $_src
-		if [[ ${_src} != '' ]]; then
-			mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
-			echo "download from $_src to /envs/$index ..."
-			curl --silent \
-				--location $_src > /envs/$index
-			echo 'File downloaded...'
-			echo '----------------------------------------'
-            echo /envs/$index
-			cat /envs/$index
-			. /envs/$index
-			echo '----------------------------------------'
-		else
-			echo "ENV_FILE_$(($index - 1)) not defined..."
-		fi
-	done
+	if [[ ${count} -gt 0 ]]; then
+        for index in $(seq ${count}); do
+            local _src_tag="ENV_FILE_$(($index - 1))"
+            local _src=`printenv ${_src_tag}`
+            echo src is ${_src}
+            if [[ ${_src} != '' ]]; then
+                mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
+                echo "download from $_src to /envs/$index ..."
+                curl --silent \
+                    --location ${_src} > /envs/${index}
+                echo 'File downloaded...'
+                echo '----------------------------------------'
+                echo /envs/${index}
+                cat /envs/${index}
+                . /envs/${index}
+                echo '----------------------------------------'
+            else
+                echo "ENV_FILE_$(($index - 1)) not defined..."
+            fi
+        done
+	fi
 }
 
 ##### Info

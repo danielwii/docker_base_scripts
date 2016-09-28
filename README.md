@@ -27,7 +27,7 @@
             && rm -rf /var/lib/apt/lists/*
         
         # alpine
-        RUN apk --no-cache add supervisor curl bash
+        RUN apk --no-cache add supervisor curl bash tar
         
         ADD https://github.com/danielwii/docker_base_scripts/archive/0.1.0.tar.gz /init/archive.tar.gz
         RUN tar zxvf /init/archive.tar.gz -C /init --xform='s|docker_base_scripts-0.1.0||S' --verbose --show-transformed-names

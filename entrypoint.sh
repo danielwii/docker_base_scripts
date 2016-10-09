@@ -7,11 +7,28 @@
 
 ##### Constants
 
+VERSION=20161009
 TITLE="System Information for $HOSTNAME"
 RIGHT_NOW=$(date +"%x %r %Z")
 TIME_STAMP="Updated on $RIGHT_NOW by $USER"
 
 ##### Functions
+
+function check_version() {
+    echo -e "[X] Check remote version..."
+    local remote_version=`curl -s https://raw.githubusercontent.com/danielwii/docker_base_scripts/master/entrypoint.sh`
+    remote_version=${VERSION}
+    if [[ remote_version =~ /^[0-9]+$/ ]]; then
+        if ! [[ ${VERSION} -eq ${remote_version} ]]; then
+            echo -e "[X] Try execute remote shell..."
+            VERSION=${remote_version}
+            curl -s https://raw.githubusercontent.com/danielwii/docker_base_scripts/master/entrypoint.sh | bash
+            exit 0
+        fi
+    else
+        echo -e "[X] No newest scripts found..."
+    fi
+}
 
 function parse_yml() {
 	local prefix=$2
@@ -39,7 +56,7 @@ function parse_yml() {
 function download_github_file() {
 	env | grep ^GITHUB_FILE
 	local count=$((`env | grep '^GITHUB_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
-    echo "Will download $count file(s) from github..."
+    echo -e "[X] Will download \033[31m$count\033[0m file(s) from github..."
 	if [[ ${count} -gt 0 ]]; then
         if [[ ${GITHUB_TOKEN} != '' ]]; then
             for index in $(seq ${count}); do
@@ -51,22 +68,22 @@ function download_github_file() {
                 echo dest is ${_dst}
                 if [[ ${_src} != '' && ${_dst} != '' ]]; then
                     mkdir -p $(dirname "$_dst") && touch "$_dst"
-                    echo "download from $_src to $_dst ..."
+                    echo "[X] Download from $_src to $_dst ..."
                     curl --silent \
                         --header "Authorization: token $GITHUB_TOKEN" \
                         --header 'Accept: application/vnd.github.v3.raw' \
                         --location "https://api.github.com/repos/$_src" > ${_dst}
     #					--remote-name $_dst \
-                    echo 'File downloaded...'
-                    echo '----------------------------------------'
+                    echo '[X] File downloaded...'
+                    echo '[X] ----------------------------------------'
                     cat ${_dst}
-                    echo '----------------------------------------'
+                    echo -e "\n[X] ----------------------------------------"
                 else
-                    echo "Neither GITHUB_FILE_$(($index - 1))_SRC or GITHUB_FILE_$(($index - 1))_DEST defined..."
+                    echo "[X] Neither GITHUB_FILE_$(($index - 1))_SRC or GITHUB_FILE_$(($index - 1))_DEST defined..."
                 fi
             done
         else
-            echo 'Github token is empty...'
+            echo '[X] Github token is empty...'
         fi
 	fi
 }
@@ -74,7 +91,7 @@ function download_github_file() {
 function download_url_file() {
 	env | grep ^URL_FILE
 	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
-	echo "Will download $count file(s) from url..."
+	echo -e "[X] Will download \033[31m$count\033[0m file(s) from url..."
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="URL_FILE_$(($index - 1))_SRC"
@@ -85,13 +102,13 @@ function download_url_file() {
             echo dest is ${_dst}
             if [[ ${_src} != '' && ${_dst} != '' ]]; then
                 mkdir -p $(dirname "$_dst") && touch "$_dst"
-                echo "download from $_src to $_dst ..."
+                echo "[X] Download from $_src to $_dst ..."
                 curl --silent \
                     --location ${_src} > ${_dst}
-                echo 'File downloaded...'
-                echo '----------------------------------------'
+                echo '[X] File downloaded...'
+                echo '[X] ----------------------------------------'
                 cat ${_dst}
-                echo '----------------------------------------'
+                echo -e "\n[X] ----------------------------------------"
             else
                 echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
             fi
@@ -102,7 +119,7 @@ function download_url_file() {
 function load_env() {
 	env | grep ^ENV_FILE
 	local count=$((`env | grep '^ENV_FILE_[0-9]' | wc -l`))
-	echo "Will download $count file(s) from url..."
+	echo -e "[X] Will download \033[31m$count\033[0m file(s) from url..."
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="ENV_FILE_$(($index - 1))"
@@ -110,17 +127,17 @@ function load_env() {
             echo src is ${_src}
             if [[ ${_src} != '' ]]; then
                 mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
-                echo "download from $_src to /envs/$index ..."
+                echo "[X] Download from $_src to /envs/$index ..."
                 curl --silent \
                     --location ${_src} > /envs/${index}
-                echo 'File downloaded...'
+                echo '[X] File downloaded...'
                 echo '----------------------------------------'
                 echo /envs/${index}
                 cat /envs/${index}
                 . /envs/${index}
                 echo '----------------------------------------'
             else
-                echo "ENV_FILE_$(($index - 1)) not defined..."
+                echo "[X] ENV_FILE_$(($index - 1)) not defined..."
             fi
         done
 	fi
@@ -137,22 +154,23 @@ eval $(parse_yml 'changelog.yml' 'changelog__')
 
 ##### Main
 
-cat <<- _EOF_
-*****************************************************************
+echo -e "[X] \033[31m*****************************************************************\033[0m"
+echo -e "[X] \033[31m\033[0m"
+echo -e "[X] \033[31m_________ .\033[0m"
+echo -e "[X] \033[31m\_   ___ \_____    ___________ __ __  ______ .\033[0m"
+echo -e "[X] \033[31m/    \  \/\__  \ _/ __ \_  __ \  |  \/  ___/ .\033[0m"
+echo -e "[X] \033[31m\     \____/ __ \\  ___/|  | \/  |  /\___ \ .\033[0m"
+echo -e "[X] \033[31m \______  (____  /\___  >__|  |____//____  > .\033[0m"
+echo -e "[X] \033[31m        \/     \/     \/                 \/ .\033[0m"
+echo -e "[X] \033[31m                                 - EntryPoint Version: ${VERSION}\033[0m"
+echo -e "[X] \033[31m                                 - This: ${changelog__latest:-snapshot version}\033[0m"
+echo -e "[X] \033[31m\033[0m"
+echo -e "[X] \033[31m*****************************************************************\033[0m"
 
-_________ .
-\_   ___ \_____    ___________ __ __  ______ .
-/    \  \/\__  \ _/ __ \_  __ \  |  \/  ___/ .
-\     \____/ __ \\  ___/|  | \/  |  /\___ \ .
- \______  (____  /\___  >__|  |____//____  > .
-        \/     \/     \/                 \/ .
-                                 - scripts ${changelog__latest:-demo version}
-
-*****************************************************************
-_EOF_
-
+check_version
 download_github_file
 download_url_file
 
-echo "run... $@"
+echo -e "[X] \033[44;37m Run... '\033[0m\033[44;31m$@\033[0m\033[44;37m' \033[0m"
+echo -e "[X] -----------------------------------------------------------------"
 exec "$@"

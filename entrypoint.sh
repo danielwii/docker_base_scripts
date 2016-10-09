@@ -16,7 +16,7 @@ TIME_STAMP="Updated on $RIGHT_NOW by $USER"
 
 function check_version() {
     echo -e "[X] Check remote version..."
-    local remote_version=`curl -s https://raw.githubusercontent.com/danielwii/docker_base_scripts/master/entrypoint.sh`
+    local remote_version=`curl -s https://raw.githubusercontent.com/danielwii/docker_base_scripts/master/VERSION`
     remote_version=${VERSION}
     if [[ remote_version =~ /^[0-9]+$/ ]]; then
         if ! [[ ${VERSION} -eq ${remote_version} ]]; then

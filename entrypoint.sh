@@ -73,9 +73,9 @@ function download_github_file() {
                         --location "https://api.github.com/repos/$_src" > ${_dst}
     #					--remote-name $_dst \
                     echo "[X] File downloaded...${_dst}"
-                    echo '[X] ----------------------------------------'
+                    echo '[X] -----------------------------------------------------------------'
                     cat ${_dst}
-                    echo -e "\n[X] ----------------------------------------"
+                    echo -e "\n[X] -----------------------------------------------------------------"
                 else
                     echo "[X] Neither GITHUB_FILE_$(($index - 1))_SRC or GITHUB_FILE_$(($index - 1))_DEST defined..."
                 fi
@@ -102,9 +102,9 @@ function download_url_file() {
                 curl --silent \
                     --location ${_src} > ${_dst}
                 echo "[X] File downloaded...${_dst}"
-                echo '[X] ----------------------------------------'
+                echo '[X] -----------------------------------------------------------------'
                 cat ${_dst}
-                echo -e "\n[X] ----------------------------------------"
+                echo -e "\n[X] -----------------------------------------------------------------"
             else
                 echo "[X] Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
             fi
@@ -126,11 +126,11 @@ function load_env() {
                 curl --silent \
                     --location ${_src} > /envs/${index}
                 echo "[X] File downloaded...${_dst}"
-                echo '[X] ----------------------------------------'
+                echo '[X] -----------------------------------------------------------------'
                 echo /envs/${index}
                 cat /envs/${index}
                 . /envs/${index}
-                echo -e '\n[X] ----------------------------------------'
+                echo -e '\n[X] -----------------------------------------------------------------'
             else
                 echo "[X] ENV_FILE_$(($index - 1)) not defined..."
             fi

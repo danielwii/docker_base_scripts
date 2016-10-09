@@ -56,7 +56,7 @@ function parse_yml() {
 function download_github_file() {
 	env | grep ^GITHUB_FILE
 	local count=$((`env | grep '^GITHUB_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
-    echo -e "[X] Will download \033[31m$count\033[0m file(s) from github..."
+    echo -e "[X] Will download \033[31m($count)\033[0m file(s) from github..."
 	if [[ ${count} -gt 0 ]]; then
         if [[ ${GITHUB_TOKEN} != '' ]]; then
             for index in $(seq ${count}); do
@@ -64,8 +64,6 @@ function download_github_file() {
                 local _dst_tag="GITHUB_FILE_$(($index - 1))_DEST"
                 local _src=`printenv ${_src_tag}`
                 local _dst=`printenv ${_dst_tag}`
-                echo src is ${_src}
-                echo dest is ${_dst}
                 if [[ ${_src} != '' && ${_dst} != '' ]]; then
                     mkdir -p $(dirname "$_dst") && touch "$_dst"
                     echo "[X] Download from $_src to $_dst ..."
@@ -74,7 +72,7 @@ function download_github_file() {
                         --header 'Accept: application/vnd.github.v3.raw' \
                         --location "https://api.github.com/repos/$_src" > ${_dst}
     #					--remote-name $_dst \
-                    echo '[X] File downloaded...'
+                    echo "[X] File downloaded...${_dst}"
                     echo '[X] ----------------------------------------'
                     cat ${_dst}
                     echo -e "\n[X] ----------------------------------------"
@@ -91,26 +89,24 @@ function download_github_file() {
 function download_url_file() {
 	env | grep ^URL_FILE
 	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
-	echo -e "[X] Will download \033[31m$count\033[0m file(s) from url..."
+	echo -e "[X] Will download \033[31m($count)\033[0m file(s) from url..."
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="URL_FILE_$(($index - 1))_SRC"
             local _dst_tag="URL_FILE_$(($index - 1))_DEST"
             local _src=`printenv ${_src_tag}`
             local _dst=`printenv ${_dst_tag}`
-            echo src is ${_src}
-            echo dest is ${_dst}
             if [[ ${_src} != '' && ${_dst} != '' ]]; then
                 mkdir -p $(dirname "$_dst") && touch "$_dst"
                 echo "[X] Download from $_src to $_dst ..."
                 curl --silent \
                     --location ${_src} > ${_dst}
-                echo '[X] File downloaded...'
+                echo "[X] File downloaded...${_dst}"
                 echo '[X] ----------------------------------------'
                 cat ${_dst}
                 echo -e "\n[X] ----------------------------------------"
             else
-                echo "Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
+                echo "[X] Neither URL_FILE_$(($index - 1))_SRC or URL_FILE_$(($index - 1))_DEST defined..."
             fi
         done
 	fi
@@ -119,23 +115,22 @@ function download_url_file() {
 function load_env() {
 	env | grep ^ENV_FILE
 	local count=$((`env | grep '^ENV_FILE_[0-9]' | wc -l`))
-	echo -e "[X] Will download \033[31m$count\033[0m file(s) from url..."
+	echo -e "[X] Will download \033[31m($count)\033[0m file(s) from url..."
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="ENV_FILE_$(($index - 1))"
             local _src=`printenv ${_src_tag}`
-            echo src is ${_src}
             if [[ ${_src} != '' ]]; then
                 mkdir -p $(dirname "/envs/$_src") && touch "/envs/$_src"
                 echo "[X] Download from $_src to /envs/$index ..."
                 curl --silent \
                     --location ${_src} > /envs/${index}
-                echo '[X] File downloaded...'
-                echo '----------------------------------------'
+                echo "[X] File downloaded...${_dst}"
+                echo '[X] ----------------------------------------'
                 echo /envs/${index}
                 cat /envs/${index}
                 . /envs/${index}
-                echo '----------------------------------------'
+                echo -e '\n[X] ----------------------------------------'
             else
                 echo "[X] ENV_FILE_$(($index - 1)) not defined..."
             fi

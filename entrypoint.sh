@@ -54,9 +54,9 @@ function parse_yml() {
 # 	- GITHUB_FILE_{0}_DEST	/config-dir/logstash.conf
 # ***
 function download_github_file() {
-	env | grep ^GITHUB_FILE
 	local count=$((`env | grep '^GITHUB_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
     echo -e "[X] Will download \033[31m($count)\033[0m file(s) from github..."
+	env | grep ^GITHUB_FILE
 	if [[ ${count} -gt 0 ]]; then
         if [[ ${GITHUB_TOKEN} != '' ]]; then
             for index in $(seq ${count}); do
@@ -87,9 +87,9 @@ function download_github_file() {
 }
 
 function download_url_file() {
-	env | grep ^URL_FILE
 	local count=$((`env | grep '^URL_FILE_[0-9]\+_\(SRC\|DEST\)' | wc -l` / 2))
 	echo -e "[X] Will download \033[31m($count)\033[0m file(s) from url..."
+	env | grep ^URL_FILE
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="URL_FILE_$(($index - 1))_SRC"
@@ -113,9 +113,9 @@ function download_url_file() {
 }
 
 function load_env() {
-	env | grep ^ENV_FILE
 	local count=$((`env | grep '^ENV_FILE_[0-9]' | wc -l`))
 	echo -e "[X] Will download \033[31m($count)\033[0m file(s) from url..."
+	env | grep ^ENV_FILE
 	if [[ ${count} -gt 0 ]]; then
         for index in $(seq ${count}); do
             local _src_tag="ENV_FILE_$(($index - 1))"

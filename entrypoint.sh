@@ -7,7 +7,7 @@
 
 ##### Constants
 
-VERSION=201610091
+VERSION=201611211
 TITLE="System Information for $HOSTNAME"
 RIGHT_NOW=$(date +"%x %r %Z")
 TIME_STAMP="Updated on $RIGHT_NOW by $USER"
@@ -138,6 +138,13 @@ function load_env() {
 	fi
 }
 
+function load_init_scripts() {
+    if [[ -d /init/scripts ]]; then
+        echo -e "[X] Load all init scripts in /init/scripts"
+        . /init/scripts/*
+    fi
+}
+
 ##### Info
 
 cat <<- _EOF_
@@ -145,7 +152,9 @@ cat <<- _EOF_
 [X] Uptime: ${TIME_STAMP}
 _EOF_
 
-eval $(parse_yml 'changelog.yml' 'changelog__')
+if [[ -f 'changelog.yml' ]]; then
+    eval $(parse_yml 'changelog.yml' 'changelog__')
+fi
 
 ##### Main
 
@@ -165,6 +174,7 @@ echo -e "[X] \033[31m***********************************************************
 check_version
 download_github_file
 download_url_file
+load_init_scripts
 
 echo -e "[X] \033[44;37m Run... '\033[0m\033[44;31m$@\033[0m\033[44;37m' \033[0m"
 echo -e "[X] -----------------------------------------------------------------"

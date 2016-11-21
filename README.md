@@ -33,6 +33,10 @@
         RUN tar zxvf /init/archive.tar.gz -C /init --xform='s|docker_base_scripts-0.1.0||S' --verbose --show-transformed-names
         # RUN git clone --depth=1 https://github.com/danielwii/docker_base_scripts.git /init
 
+- Add init scripts to /init_scripts folder
+
+        Add 0.init.sh /init/scripts/
+
 - Add your custom program config to /init/conf
 
         ADD supervisor.app.conf /init/conf/

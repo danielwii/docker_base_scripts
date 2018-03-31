@@ -47,7 +47,7 @@
 - Add custom init scripts to /init/scripts
     
     ```dockerfile
-    Add 0.init.sh /init/scripts/
+    ADD 0.init.sh /init/scripts/
     ```
     
 - Setup entrypoint
